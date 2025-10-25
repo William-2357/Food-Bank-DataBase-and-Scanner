@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "Food Bank Barcode Scanner API",
+    "description": "A comprehensive API for barcode scanning, food inventory management, and nutritional data retrieval",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Barcode Scanner",
+      "item": [
+        {
+          "name": "Scan Barcode Only",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barcode\": \"123456789\",\n  \"action\": \"scan\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/barcode-scanner",
+              "host": ["{{baseUrl}}"],
+              "path": ["barcode-scanner"]
+            },
+            "description": "Scan a barcode and retrieve product data from OpenFoodFacts without saving to database"
+          },
+          "response": []
+        },
+        {
+          "name": "Scan and Save Barcode",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barcode\": \"123456789\",\n  \"action\": \"scan_and_save\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/barcode-scanner",
+              "host": ["{{baseUrl}}"],
+              "path": ["barcode-scanner"]
+            },
+            "description": "Scan a barcode, retrieve product data, and save to database"
+          },
+          "response": []
+        }
+      ],
+      "description": "Operations for scanning barcodes and retrieving product data from OpenFoodFacts"
+    },
+    {
+      "name": "Food Inventory",
+      "item": [
+        {
+          "name": "Get All Foods",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/foods",
+              "host": ["{{baseUrl}}"],
+              "path": ["foods"]
+            },
+            "description": "Retrieve all food items from the database"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Foods by Barcode",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/foods?barcode=123456789",
+              "host": ["{{baseUrl}}"],
+              "path": ["foods"],
+              "query": [
+                {
+                  "key": "barcode",
+                  "value": "123456789"
+                }
+              ]
+            },
+            "description": "Retrieve food items filtered by barcode"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Foods",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/foods?search=apple&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["foods"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "apple"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Search food items by name, brand, or category"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Food by ID",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/foods?id=550e8400-e29b-41d4-a716-446655440000",
+              "host": ["{{baseUrl}}"],
+              "path": ["foods"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            },
+            "description": "Delete a specific food item by its ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Foods by Barcode",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/foods?barcode=123456789",
+              "host": ["{{baseUrl}}"],
+              "path": ["foods"],
+              "query": [
+                {
+                  "key": "barcode",
+                  "value": "123456789"
+                }
+              ]
+            },
+            "description": "Delete all food items with a specific barcode"
+          },
+          "response": []
+        }
+      ],
+      "description": "Operations for managing food inventory in the database"
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://your-app.vercel.app/api",
+      "type": "string"
+    }
+  ]
+}

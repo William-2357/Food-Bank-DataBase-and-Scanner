@@ -1,0 +1,137 @@
+FOOD BANK BARCODE SCANNER - DATABASE INFORMATION
+==================================================
+
+1. DATABASE TYPE
+   ☑️ SQLite (with SQLAlchemy ORM)
+   - Using SQLite for simplicity and easy setup
+   - SQLAlchemy provides the ORM layer for database operations
+   - No external database server required
+
+2. CONNECTION CODE
+   How we connect to the database:
+
+   # Database configuration
+   DATABASE_URL = "sqlite:///./food_tracking.db"
+
+   # SQLAlchemy engine
+   engine = create_engine(
+       DATABASE_URL,
+       poolclass=StaticPool,
+       pool_pre_ping=True,
+       pool_recycle=300,
+       echo=False
+   )
+
+   # Session factory
+   SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+   # Connection function
+   def get_db():
+       db = SessionLocal()
+       try:
+           yield db
+       finally:
+           db.close()
+
+3. INVENTORY TABLE STRUCTURE
+   Table Name: foods
+
+   Column Structure:
+   CREATE TABLE foods (
+       id TEXT PRIMARY KEY,                    -- UUID as string
+       barcode TEXT UNIQUE NOT NULL,           -- Product barcode
+       name TEXT NOT NULL,                     -- Product name
+       brand TEXT,                             -- Brand name
+       category TEXT,                          -- Food category
+       calories INTEGER,                       -- Calories per serving
+       protein REAL,                          -- Protein in grams
+       fat REAL,                              -- Fat in grams
+       carbs REAL,                            -- Carbohydrates in grams
+       fiber REAL,                            -- Fiber in grams
+       sugars REAL,                           -- Sugars in grams
+       sodium REAL,                           -- Sodium in mg
+       allergens JSON,                        -- List of allergens
+       expiry_date DATE,                      -- Expiration date
+       quantity INTEGER DEFAULT 0,            -- Current stock quantity
+       location TEXT,                         -- Storage location
+       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   );
+
+4. SAMPLE QUERIES
+   How to fetch inventory:
+
+   Fetch All Inventory:
+   # Using SQLAlchemy ORM
+   foods = db.query(Food).all()
+   
+   # Raw SQL equivalent
+   SELECT * FROM foods;
+
+   Fetch Low Stock Items:
+   # Using SQLAlchemy ORM
+   low_stock = db.query(Food).filter(Food.quantity <= 5).all()
+   
+   # Raw SQL equivalent
+   SELECT * FROM foods WHERE quantity <= 5;
+
+   Fetch Expiring Foods:
+   # Using SQLAlchemy ORM
+   from datetime import date, timedelta
+   expiry_date = date.today() + timedelta(days=7)
+   expiring = db.query(Food).filter(
+       Food.expiry_date <= expiry_date,
+       Food.expiry_date >= date.today(),
+       Food.quantity > 0
+   ).all()
+   
+   # Raw SQL equivalent
+   SELECT * FROM foods 
+   WHERE expiry_date <= date('now', '+7 days') 
+   AND expiry_date >= date('now') 
+   AND quantity > 0;
+
+   Search by Barcode:
+   # Using SQLAlchemy ORM
+   food = db.query(Food).filter(Food.barcode == "1234567890123").first()
+   
+   # Raw SQL equivalent
+   SELECT * FROM foods WHERE barcode = '1234567890123';
+
+   Update Quantity:
+   # Using SQLAlchemy ORM
+   food = db.query(Food).filter(Food.barcode == "1234567890123").first()
+   food.quantity += 5
+   db.commit()
+   
+   # Raw SQL equivalent
+   UPDATE foods SET quantity = quantity + 5 WHERE barcode = '1234567890123';
+
+ADDITIONAL FEATURES
+==================
+
+Nutrition Logs Table:
+CREATE TABLE nutrition_logs (
+    id TEXT PRIMARY KEY,
+    food_id TEXT NOT NULL,
+    quantity INTEGER NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    action TEXT NOT NULL CHECK (action IN ('added', 'removed', 'consumed', 'expired')),
+    FOREIGN KEY (food_id) REFERENCES foods (id) ON DELETE CASCADE
+);
+
+API Endpoints Available:
+- GET /foods/ - List all foods
+- GET /foods/{food_id} - Get specific food
+- GET /foods/barcode/{barcode} - Get by barcode
+- POST /foods/ - Create/update food
+- GET /inventory/expiring - Get expiring foods
+- GET /inventory/low-stock - Get low stock items
+
+SYSTEM STATUS
+=============
+✅ Backend: Running on http://localhost:8000
+✅ Frontend: Running on http://localhost:3000
+✅ Database: SQLite with proper schema
+✅ API Documentation: http://localhost:8000/docs
+
+This system is designed for food bank inventory management with barcode scanning integration!

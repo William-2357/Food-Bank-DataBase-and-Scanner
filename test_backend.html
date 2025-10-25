@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Test</title>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    <button onclick="testConnection()">Test Backend Connection</button>
+    <button onclick="testFoodSubmission()">Test Food Submission</button>
+    <div id="result"></div>
+
+    <script>
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                const data = await response.json();
+                resultDiv.innerHTML = `<p>✅ Backend is running: ${JSON.stringify(data)}</p>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<p>❌ Backend connection failed: ${error.message}</p>`;
+            }
+        }
+
+        async function testFoodSubmission() {
+            const resultDiv = document.getElementById('result');
+            try {
+                const testData = {
+                    barcode: "1234567890123",
+                    name: "Test Product from Frontend",
+                    brand: "Test Brand",
+                    category: "Test Category",
+                    calories: 250,
+                    quantity: 1
+                };
+
+                const response = await fetch('http://localhost:8000/foods/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<p>✅ Food submission successful: ${JSON.stringify(data)}</p>`;
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    resultDiv.innerHTML = `<p>❌ Food submission failed: ${response.status} - ${JSON.stringify(errorData)}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p>❌ Food submission error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

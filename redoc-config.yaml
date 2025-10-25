@@ -1,0 +1,101 @@
+# ReDoc Configuration for Food Bank Barcode Scanner API
+redoc:
+  title: "Food Bank Barcode Scanner API"
+  description: "A comprehensive API for barcode scanning, food inventory management, and nutritional data retrieval"
+  version: "1.0.0"
+  contact:
+    name: "Food Bank Scanner API"
+    email: "support@foodbank-scanner.com"
+  license:
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+
+# ReDoc specific configuration
+redocOptions:
+  theme:
+    colors:
+      primary:
+        main: "#1976d2"
+      secondary:
+        main: "#dc004e"
+    typography:
+      fontSize: "14px"
+      fontFamily: "Roboto, sans-serif"
+      headings:
+        fontFamily: "Roboto, sans-serif"
+        fontWeight: "400"
+    sidebar:
+      width: "300px"
+      backgroundColor: "#fafafa"
+    rightPanel:
+      backgroundColor: "#263238"
+      width: "40%"
+    codeBlock:
+      backgroundColor: "#f5f5f5"
+    scrollbar:
+      width: "8px"
+      trackColor: "#f1f1f1"
+      thumbColor: "#c1c1c1"
+      thumbHoverColor: "#a8a8a8"
+
+# API Documentation settings
+info:
+  title: "Food Bank Barcode Scanner API"
+  description: |
+    ## Overview
+    This API provides comprehensive functionality for:
+    - **Barcode Scanning**: Retrieve product data from OpenFoodFacts
+    - **Food Inventory Management**: Full CRUD operations for food items
+    - **Nutritional Data**: Complete nutritional information and allergen data
+    - **Duplicate Support**: Allow multiple entries of the same barcode
+
+    ## Features
+    - 🔍 **Barcode Scanning**: Support for EAN-13, UPC-A, Code 128, QR codes
+    - 📊 **Nutritional Data**: Complete nutritional information from OpenFoodFacts
+    - 🏷️ **Allergen Detection**: Automatic allergen and dietary restriction detection
+    - 📱 **Mobile Ready**: Optimized for mobile applications like Creo
+    - 🔄 **Duplicate Support**: Allow multiple entries of the same product
+    - 🌐 **CORS Enabled**: Cross-origin requests supported
+
+    ## Rate Limits
+    - OpenFoodFacts API: Respects their rate limits
+    - Database Operations: No specific limits
+    - CORS: Enabled for all origins
+
+  version: "1.0.0"
+  contact:
+    name: "Food Bank Scanner API Support"
+    email: "support@foodbank-scanner.com"
+    url: "https://github.com/foodbank-scanner/api"
+  license:
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+
+# Server configuration
+servers:
+  - url: "https://your-app.vercel.app/api"
+    description: "Production server"
+  - url: "http://localhost:3000/api"
+    description: "Development server"
+
+# Security configuration
+security:
+  - ApiKeyAuth: []
+
+# Tags for organization
+tags:
+  - name: "Barcode Scanner"
+    description: "Operations for scanning barcodes and retrieving product data from OpenFoodFacts"
+    externalDocs:
+      description: "OpenFoodFacts Documentation"
+      url: "https://world.openfoodfacts.org/data"
+  - name: "Food Inventory"
+    description: "Operations for managing food inventory in the database"
+    externalDocs:
+      description: "Database Schema"
+      url: "https://github.com/foodbank-scanner/api/blob/main/sql/schema.sql"
+
+# External documentation
+externalDocs:
+  description: "Complete API Documentation"
+  url: "https://github.com/foodbank-scanner/api/blob/main/API_DOCUMENTATION.md"
