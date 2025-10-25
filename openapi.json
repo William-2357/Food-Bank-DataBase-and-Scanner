@@ -1,0 +1,505 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Food Bank Barcode Scanner API",
+    "description": "A comprehensive API for barcode scanning, food inventory management, and nutritional data retrieval. Integrates with OpenFoodFacts to provide product information, supports duplicate entries, and offers full CRUD operations for food inventory management.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Food Bank Scanner API",
+      "email": "support@foodbank-scanner.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://food-bank-scanner-api.vercel.app/api",
+      "description": "Production server (Vercel)"
+    },
+    {
+      "url": "https://your-app.vercel.app/api",
+      "description": "Custom Vercel deployment"
+    },
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/barcode-scanner": {
+      "post": {
+        "summary": "Scan barcode and retrieve/save product data",
+        "description": "Scans a barcode and retrieves product information from OpenFoodFacts. Can optionally save the product to the database.",
+        "operationId": "scanBarcode",
+        "tags": ["Barcode Scanner"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BarcodeScanRequest"
+              },
+              "examples": {
+                "scan_only": {
+                  "summary": "Scan barcode only",
+                  "value": {
+                    "barcode": "123456789",
+                    "action": "scan"
+                  }
+                },
+                "scan_and_save": {
+                  "summary": "Scan and save to database",
+                  "value": {
+                    "barcode": "123456789",
+                    "action": "scan_and_save"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BarcodeScanResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid barcode or action",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found in OpenFoodFacts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/foods": {
+      "get": {
+        "summary": "Get food inventory",
+        "description": "Retrieve food items from the database with optional filtering and pagination.",
+        "operationId": "getFoods",
+        "tags": ["Food Inventory"],
+        "parameters": [
+          {
+            "name": "barcode",
+            "in": "query",
+            "description": "Filter by barcode",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{8,14}$"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search by name, brand, or category",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of results",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of results to skip",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Food items retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FoodsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete food items",
+        "description": "Delete food items by ID or barcode. Supports bulk deletion by barcode.",
+        "operationId": "deleteFoods",
+        "tags": ["Food Inventory"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Delete food by ID",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "barcode",
+            "in": "query",
+            "description": "Delete all foods with this barcode",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{8,14}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Food items deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - missing ID or barcode",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Food not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BarcodeScanRequest": {
+        "type": "object",
+        "required": ["barcode"],
+        "properties": {
+          "barcode": {
+            "type": "string",
+            "pattern": "^[0-9]{8,14}$",
+            "description": "Barcode to scan (8-14 digits)",
+            "example": "123456789"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["scan", "save", "scan_and_save"],
+            "default": "scan",
+            "description": "Action to perform with the barcode"
+          }
+        }
+      },
+      "BarcodeScanResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/FoodItem"
+          },
+          "message": {
+            "type": "string",
+            "example": "Product scanned and saved successfully"
+          }
+        }
+      },
+      "FoodsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FoodItem"
+            }
+          },
+          "count": {
+            "type": "integer",
+            "example": 25
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "limit": {
+                "type": "integer",
+                "example": 100
+              },
+              "offset": {
+                "type": "integer",
+                "example": 0
+              },
+              "hasMore": {
+                "type": "boolean",
+                "example": true
+              }
+            }
+          }
+        }
+      },
+      "DeleteResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Deleted 3 food items with barcode 123456789"
+          }
+        }
+      },
+      "FoodItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the food item",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "barcode": {
+            "type": "string",
+            "pattern": "^[0-9]{8,14}$",
+            "description": "Product barcode",
+            "example": "123456789"
+          },
+          "name": {
+            "type": "string",
+            "description": "Product name",
+            "example": "Organic Apple"
+          },
+          "brand": {
+            "type": "string",
+            "nullable": true,
+            "description": "Product brand",
+            "example": "Fresh Farm"
+          },
+          "category": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "description": "Product categories",
+            "example": ["Fruits", "Organic"]
+          },
+          "calories": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Calories per 100g",
+            "example": 52
+          },
+          "protein": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Protein content per 100g (g)",
+            "example": 0.3
+          },
+          "fat": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Fat content per 100g (g)",
+            "example": 0.2
+          },
+          "carbs": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Carbohydrates per 100g (g)",
+            "example": 14.0
+          },
+          "fiber": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Fiber content per 100g (g)",
+            "example": 2.4
+          },
+          "sugars": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Sugars per 100g (g)",
+            "example": 10.4
+          },
+          "sodium": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Sodium content per 100g (g)",
+            "example": 0.001
+          },
+          "allergens": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of allergens and dietary information",
+            "example": ["vegan", "gluten-free"]
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "description": "Product image URL",
+            "example": "https://world.openfoodfacts.org/images/products/123/456/789/front_en.4.400.jpg"
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Product expiry date",
+            "example": "2024-12-31"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Quantity in inventory",
+            "example": 5
+          },
+          "location": {
+            "type": "string",
+            "nullable": true,
+            "description": "Storage location",
+            "example": "Fridge A"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the item was added to inventory",
+            "example": "2024-01-01T12:00:00Z"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "string",
+            "description": "Error type",
+            "example": "Bad Request"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message",
+            "example": "Invalid barcode format"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API key for authentication (if required)"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Barcode Scanner",
+      "description": "Operations for scanning barcodes and retrieving product data from OpenFoodFacts"
+    },
+    {
+      "name": "Food Inventory",
+      "description": "Operations for managing food inventory in the database"
+    }
+  ],
+  "externalDocs": {
+    "description": "OpenFoodFacts API Documentation",
+    "url": "https://world.openfoodfacts.org/data"
+  }
+}

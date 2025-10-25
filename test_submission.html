@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Backend Submission</title>
+</head>
+<body>
+    <h1>Test Backend Submission</h1>
+    <button onclick="testSubmission()">Test Product Submission</button>
+    <div id="result"></div>
+
+    <script>
+        async function testSubmission() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing submission...</p>';
+            
+            try {
+                // Simulate the data that would come from OpenFoodFacts
+                const productData = {
+                    barcode: "1234567890130",
+                    product_name: "Test Product from Frontend",
+                    brand: "Test Brand",
+                    categories: ["Test Category"],
+                    nutritional_values: {
+                        calories: 250.5, // This should be rounded to 251
+                        proteins: 10.5,
+                        fat: 5.2,
+                        carbohydrates: 30.1,
+                        fiber: 2.5,
+                        sugars: 15.0,
+                        salt: 200.0
+                    },
+                    labels: ["gluten", "dairy"],
+                    expiration_date: "2024-12-31" // Valid date format
+                };
+
+                // Map the data like the frontend does
+                const backendData = {
+                    barcode: productData.barcode,
+                    name: productData.product_name || 'Unknown Product',
+                    brand: productData.brand,
+                    category: productData.categories?.[0],
+                    calories: productData.nutritional_values?.calories ? Math.round(productData.nutritional_values.calories) : undefined,
+                    protein: productData.nutritional_values?.proteins,
+                    fat: productData.nutritional_values?.fat,
+                    carbs: productData.nutritional_values?.carbohydrates,
+                    fiber: productData.nutritional_values?.fiber,
+                    sugars: productData.nutritional_values?.sugars,
+                    sodium: productData.nutritional_values?.salt,
+                    allergens: productData.labels || [],
+                    ...(productData.expiration_date && { expiry_date: productData.expiration_date }),
+                    quantity: 1,
+                };
+
+                console.log('Submitting data:', backendData);
+
+                const response = await fetch('http://localhost:8000/foods/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(backendData),
+                });
+
+                console.log('Response status:', response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<p>✅ Success! Created food: ${JSON.stringify(data, null, 2)}</p>`;
+                } else {
+                    const errorData = await response.json();
+                    console.error('Error response:', errorData);
+                    
+                    let errorMessage = `❌ Error ${response.status}: `;
+                    if (errorData.detail) {
+                        if (Array.isArray(errorData.detail)) {
+                            const validationErrors = errorData.detail.map(err => 
+                                `${err.loc?.join('.')}: ${err.msg}`
+                            ).join(', ');
+                            errorMessage += `Validation errors: ${validationErrors}`;
+                        } else {
+                            errorMessage += errorData.detail;
+                        }
+                    } else {
+                        errorMessage += JSON.stringify(errorData);
+                    }
+                    
+                    resultDiv.innerHTML = `<p>${errorMessage}</p>`;
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                resultDiv.innerHTML = `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

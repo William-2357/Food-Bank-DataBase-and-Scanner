@@ -1,0 +1,42 @@
+{
+  "name": "food-bank-scanner-api",
+  "version": "1.0.0",
+  "description": "Barcode scanner API for food bank applications",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "next build",
+    "start": "next start",
+    "vercel-build": "next build"
+  },
+  "dependencies": {
+    "@vercel/postgres": "^0.5.0",
+    "next": "^14.2.33",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "uuid": "^9.0.0",
+    "axios": "^1.6.0",
+    "@zxing/library": "^0.20.0"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "barcode",
+    "scanner",
+    "food",
+    "api",
+    "vercel",
+    "creo",
+    "nextjs"
+  ],
+  "author": "Food Bank Scanner",
+  "license": "MIT"
+}
