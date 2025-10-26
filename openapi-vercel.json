@@ -16,20 +16,24 @@
   },
   "servers": [
     {
-      "url": "https://food-bank-scanner-api.vercel.app/api",
-      "description": "Production server (Vercel)"
+      "url": "https://food-bank-scanner-lo1v3b7ub-williams-projects-d0619cfa.vercel.app",
+      "description": "Production server (Vercel - Live)"
     },
     {
-      "url": "https://your-app.vercel.app/api",
-      "description": "Custom Vercel deployment - replace 'your-app' with your actual Vercel app name"
+      "url": "https://food-bank-scanner-r543o8sxe-williams-projects-d0619cfa.vercel.app",
+      "description": "Alternative production server (Vercel)"
     },
     {
-      "url": "http://localhost:3000/api",
-      "description": "Development server (vercel dev)"
+      "url": "https://food-bank-scanner-api.vercel.app",
+      "description": "Canonical production URL (Vercel)"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server (localhost)"
     }
   ],
   "paths": {
-    "/barcode-scanner": {
+    "/api/barcode-scanner": {
       "post": {
         "summary": "Scan barcode and retrieve/save product data",
         "description": "Scans a barcode and retrieves product information from OpenFoodFacts. Can optionally save the product to the PostgreSQL database. Supports CORS for mobile applications.",
@@ -164,7 +168,7 @@
         }
       }
     },
-    "/foods": {
+    "/api/foods": {
       "get": {
         "summary": "Get food inventory",
         "description": "Retrieve food items from the PostgreSQL database with optional filtering and pagination. Supports search across multiple fields.",
