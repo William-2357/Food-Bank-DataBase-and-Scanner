@@ -1,39 +1,12 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "pages/**/*.js",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/pages/$1"
-    }
-  ],
-  "env": {
-    "POSTGRES_URL": "@postgres_url",
-    "POSTGRES_PRISMA_URL": "@postgres_prisma_url",
-    "POSTGRES_URL_NON_POOLING": "@postgres_url_non_pooling",
-    "POSTGRES_USER": "@postgres_user",
-    "POSTGRES_HOST": "@postgres_host",
-    "POSTGRES_PASSWORD": "@postgres_password",
-    "POSTGRES_DATABASE": "@postgres_database"
-  },
   "functions": {
     "api/barcode-scanner.js": {
       "maxDuration": 30
     },
     "api/foods.js": {
+      "maxDuration": 10
+    },
+    "pages/api/**/*.js": {
       "maxDuration": 10
     }
   }
