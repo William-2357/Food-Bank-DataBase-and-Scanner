@@ -1,0 +1,322 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Food Bank Barcode Scanner API - Creo Integration",
+    "description": "Barcode scanner API for Creo integration. Scans barcodes, fetches product data from OpenFoodFacts, and saves to database.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Food Bank Scanner API",
+      "email": "support@foodbank-scanner.com",
+      "url": "https://github.com/foodbank-scanner/api"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://food-bank-scanner-lo1v3b7ub-williams-projects-d0619cfa.vercel.app",
+      "description": "Production server (Vercel - Live)"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server (localhost)"
+    }
+  ],
+  "paths": {
+    "/api/barcode-scanner": {
+      "post": {
+        "summary": "Scan barcode and save product to database",
+        "description": "Scans a barcode, retrieves product information from OpenFoodFacts, and saves it to the PostgreSQL database. This endpoint is optimized for Creo integration.",
+        "operationId": "scanAndSaveBarcode",
+        "tags": ["Barcode Scanner"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["barcode"],
+                "properties": {
+                  "barcode": {
+                    "type": "string",
+                    "pattern": "^[0-9]{8,14}$",
+                    "description": "Product barcode (8-14 digits)",
+                    "example": "3017620422003"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": ["scan_and_save"],
+                    "default": "scan_and_save",
+                    "description": "Action to perform - must be 'scan_and_save' for this endpoint"
+                  }
+                }
+              },
+              "examples": {
+                "scan_and_save": {
+                  "summary": "Scan and save product",
+                  "value": {
+                    "barcode": "3017620422003",
+                    "action": "scan_and_save"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product scanned and saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FoodItem"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Product scanned and saved successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                    "barcode": "3017620422003",
+                    "name": "Nutella",
+                    "brand": "Ferrero",
+                    "category": ["Spreads", "Nut spreads"],
+                    "calories": 539,
+                    "protein": 6.3,
+                    "fat": 30.9,
+                    "carbs": 57.5,
+                    "fiber": 0.0,
+                    "sugars": 56.3,
+                    "sodium": 0.042,
+                    "allergens": ["hazelnuts", "milk", "soy"],
+                    "image_url": "https://world.openfoodfacts.org/images/products/301/762/042/2003/front_en.4.400.jpg",
+                    "expiry_date": null,
+                    "quantity": 1,
+                    "location": null,
+                    "created_at": "2024-01-01T12:00:00Z"
+                  },
+                  "message": "Product scanned and saved successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid barcode format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "error": "Bad Request",
+                  "message": "Invalid barcode format. Must be 8-14 digits."
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found in OpenFoodFacts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "error": "Not Found",
+                  "message": "Product with barcode 123456789 not found in OpenFoodFacts."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "error": "Internal Server Error",
+                  "message": "An unexpected error occurred."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FoodItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the food item",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "barcode": {
+            "type": "string",
+            "pattern": "^[0-9]{8,14}$",
+            "description": "Product barcode",
+            "example": "3017620422003"
+          },
+          "name": {
+            "type": "string",
+            "description": "Product name",
+            "example": "Nutella"
+          },
+          "brand": {
+            "type": "string",
+            "nullable": true,
+            "description": "Product brand",
+            "example": "Ferrero"
+          },
+          "category": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "description": "Product categories",
+            "example": ["Spreads", "Nut spreads"]
+          },
+          "calories": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Calories per 100g",
+            "example": 539
+          },
+          "protein": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Protein content per 100g (g)",
+            "example": 6.3
+          },
+          "fat": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Fat content per 100g (g)",
+            "example": 30.9
+          },
+          "carbs": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Carbohydrates per 100g (g)",
+            "example": 57.5
+          },
+          "fiber": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Fiber content per 100g (g)",
+            "example": 0.0
+          },
+          "sugars": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Sugars per 100g (g)",
+            "example": 56.3
+          },
+          "sodium": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Sodium content per 100g (g)",
+            "example": 0.042
+          },
+          "allergens": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of allergens and dietary information",
+            "example": ["hazelnuts", "milk", "soy"]
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "description": "Product image URL",
+            "example": "https://world.openfoodfacts.org/images/products/301/762/042/2003/front_en.4.400.jpg"
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Product expiry date",
+            "example": "2024-12-31"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Quantity in inventory",
+            "example": 1
+          },
+          "location": {
+            "type": "string",
+            "nullable": true,
+            "description": "Storage location",
+            "example": null
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the item was added to inventory",
+            "example": "2024-01-01T12:00:00Z"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "string",
+            "description": "Error type",
+            "example": "Bad Request"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message",
+            "example": "Invalid barcode format"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Barcode Scanner",
+      "description": "Barcode scanning and product data retrieval from OpenFoodFacts"
+    }
+  ],
+  "externalDocs": {
+    "description": "OpenFoodFacts API Documentation",
+    "url": "https://world.openfoodfacts.org/data"
+  }
+}
