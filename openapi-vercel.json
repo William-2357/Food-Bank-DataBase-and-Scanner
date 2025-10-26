@@ -6,8 +6,8 @@
     "version": "1.0.0",
     "contact": {
       "name": "Food Bank Scanner API",
-      "email": "support@foodbank-scanner.com",
-      "url": "https://github.com/foodbank-scanner/api"
+      "email": "wwang18388@gmail.com",
+      "url": "https://github.com/William-2357/Food-Bank-DataBase-and-Scanner"
     },
     "license": {
       "name": "MIT",
@@ -16,16 +16,8 @@
   },
   "servers": [
     {
-      "url": "https://food-bank-scanner-lo1v3b7ub-williams-projects-d0619cfa.vercel.app",
-      "description": "Production server (Vercel - Live)"
-    },
-    {
-      "url": "https://food-bank-scanner-r543o8sxe-williams-projects-d0619cfa.vercel.app",
-      "description": "Alternative production server (Vercel)"
-    },
-    {
       "url": "https://food-bank-scanner-api.vercel.app",
-      "description": "Canonical production URL (Vercel)"
+      "description": "Production server (Vercel - Primary)"
     },
     {
       "url": "http://localhost:3000",
@@ -639,7 +631,7 @@
     }
   ],
   "externalDocs": {
-    "description": "Complete API Documentation",
-    "url": "https://github.com/foodbank-scanner/api/blob/main/API_DOCUMENTATION.md"
+    "description": "Complete API Documentation and Creo Integration Guide",
+    "url": "https://github.com/William-2357/Food-Bank-DataBase-and-Scanner/blob/main/CREO_INTEGRATION.md"
   }
 }
